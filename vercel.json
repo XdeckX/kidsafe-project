@@ -7,5 +7,6 @@
   "regions": ["iad1"],
   "github": {
     "silent": true
-  }
+  },
+  "alias": ["thekidsafe.com", "www.thekidsafe.com"]
 }
