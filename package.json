@@ -7,7 +7,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "vercel-build": "npm install && turbo run build --filter=@repo/lib --filter=@repo/ui && cd apps/web && npm run build"
+    "vercel-build": "npm install && turbo run build --filter=@repo/lib --filter=@repo/ui && cd apps/web && npm run build",
+    "install:lib": "cd packages/lib && npm install && npm run build && cd ../ui && npm install && npm run build"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
