@@ -123,8 +123,15 @@ export default function ChannelManagementPage() {
     }
     
     // Generate a mock name based on the URL or input
-    const urlParts = url.split(/[@/]/);
-    const lastPart = urlParts[urlParts.length - 1].replace(/[^a-zA-Z0-9]/g, '');
+    const urlParts = url ? url.split(/[@/]/) : [];
+    // Add safety check to avoid undefined access
+    let lastPart = '';
+    if (urlParts.length > 0) {
+      const lastPartRaw = urlParts[urlParts.length - 1];
+      if (lastPartRaw) {
+        lastPart = lastPartRaw.replace(/[^a-zA-Z0-9]/g, '');
+      }
+    }
     const mockName = lastPart || `Channel ${channels.length + 1}`;
     
     return {

@@ -6,14 +6,16 @@ import { useAuth } from "../../lib/auth-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { RegistrationFlow } from "../../components/auth/RegistrationFlow";
 import { PlanType } from "../../components/auth/PlanTypes";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+// Client component that uses searchParams
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isSignUp = searchParams.get("signup") === "true";
   const selectedPlan = searchParams.get("plan") as PlanType | null;
   const { signIn } = useAuth();
-
+  
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Link href="/" className="absolute top-4 left-4 text-purple-600 hover:underline flex items-center gap-1">
@@ -63,12 +65,21 @@ export default function LoginPage() {
             <p className="text-gray-600 dark:text-gray-300">
               Don't have an account?{" "}
               <Link href="/login?signup=true" className="text-purple-600 hover:underline">
-                Create one
+                Sign up
               </Link>
             </p>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

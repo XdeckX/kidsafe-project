@@ -4,7 +4,48 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "../../../../../components/ui/button";
-import { type ChildProfile, type Video } from "@repo/lib/src/types";
+
+// Custom type definitions to match Supabase schema
+interface ChildProfile {
+  id: string;
+  name: string;
+  avatar_color?: string;
+  parent_id: string;
+  pin?: string;
+  created_at?: string;
+}
+
+interface Channel {
+  id: string;
+  channel_id: string;
+  channel_name: string;
+  thumbnail_url?: string;
+  description?: string;
+  subscriber_count?: string;
+  video_count?: string;
+  safe?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface Video {
+  id: string;
+  youtube_video_id: string;
+  title: string;
+  thumbnail_url?: string;
+  duration_str?: string;
+  channel_id: string;
+  channel_name?: string;
+  category?: string;
+  views?: string;
+  published_at: string;
+  safe: boolean;
+  age_rating?: string;
+  junk_score?: number;
+  loud_score?: number;
+  created_at?: string;
+  updated_at?: string;
+}
 
 // Mock data storage keys
 const CHILD_PROFILES_KEY = "kidsafe_child_profiles";
@@ -52,7 +93,7 @@ export default function WatchVideoPage() {
           // Find related videos (same category or channel)
           const related = allVideos.filter((v: Video) => 
             v.id !== videoId && 
-            (v.category === foundVideo.category || v.channelId === foundVideo.channelId)
+            (v.category === foundVideo.category || v.channel_id === foundVideo.channel_id)
           ).slice(0, 4);
           setRelatedVideos(related);
           
@@ -130,7 +171,7 @@ export default function WatchVideoPage() {
       <header className="bg-white dark:bg-gray-800 shadow-md py-3 px-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Link href={`/kid/${childId}/channel/${video.channelId}`} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            <Link href={`/kid/${childId}/channel/${video.channel_id}`} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
@@ -175,10 +216,10 @@ export default function WatchVideoPage() {
           </h2>
           
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <span>{video.views} views</span>
-              <span>•</span>
-              <span>{new Date(video.publishedAt).toLocaleDateString()}</span>
+            <div className="flex items-center text-sm mb-3">
+              <span className="text-gray-600 dark:text-gray-400">
+                {video.views} • {new Date(video.published_at).toLocaleDateString()}
+              </span>
             </div>
             
             <div className="flex items-center gap-2">
@@ -222,9 +263,9 @@ export default function WatchVideoPage() {
                 <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow hover:shadow-md transition-shadow">
                   <div className="relative pb-[56.25%]"> {/* 16:9 aspect ratio */}
                     <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                      {relatedVideo.thumbnail ? (
+                      {relatedVideo.thumbnail_url ? (
                         <img 
-                          src={relatedVideo.thumbnail} 
+                          src={relatedVideo.thumbnail_url} 
                           alt={relatedVideo.title} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -235,8 +276,8 @@ export default function WatchVideoPage() {
                         </svg>
                       )}
                     </div>
-                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
-                      {relatedVideo.duration}
+                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded">
+                      {relatedVideo.duration_str}
                     </div>
                   </div>
                   
@@ -244,9 +285,9 @@ export default function WatchVideoPage() {
                     <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 mb-1">
                       {relatedVideo.title}
                     </h4>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {relatedVideo.views} views
-                    </div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {relatedVideo.views}
+                    </span>
                   </div>
                 </div>
               </Link>

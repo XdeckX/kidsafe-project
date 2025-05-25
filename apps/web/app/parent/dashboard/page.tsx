@@ -474,6 +474,18 @@ export default function ParentDashboard() {
                           <Button variant="outline" size="sm" className="text-gray-600">
                             Edit
                           </Button>
+                          <Link href={`/parent/channel-management?childId=${child.id}`}>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-blue-600 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                              Channels
+                            </Button>
+                          </Link>
                           <Button 
                             onClick={() => enterKidMode(child.id)}
                             className="bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200"

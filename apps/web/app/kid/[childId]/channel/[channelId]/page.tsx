@@ -5,74 +5,172 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "../../../../../components/ui/button";
 import { Card } from "../../../../../components/ui/card";
-import { type ChildProfile, type Channel, type Video } from "@repo/lib/src/types";
+// Custom type definitions to match Supabase schema
+interface ChildProfile {
+  id: string;
+  name: string;
+  avatar_color?: string;
+  parent_id: string;
+  pin?: string;
+  created_at?: string;
+}
+
+interface Channel {
+  id: string;
+  channel_id: string;
+  channel_name: string;
+  thumbnail_url?: string;
+  description?: string;
+  subscriber_count?: string;
+  video_count?: string;
+  safe?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface Video {
+  id: string;
+  youtube_video_id: string;
+  title: string;
+  thumbnail_url?: string;
+  duration_str?: string;
+  channel_id: string;
+  channel_name?: string;
+  category?: string;
+  views?: string;
+  published_at: string;
+  safe: boolean;
+  age_rating?: string;
+  junk_score?: number;
+  loud_score?: number;
+  created_at?: string;
+  updated_at?: string;
+}
 
 // Mock data storage keys
 const CHILD_PROFILES_KEY = "kidsafe_child_profiles";
 const CHANNELS_KEY = "kidsafe_channels";
 const VIDEOS_KEY = "kidsafe_videos";
 
+// Helper function to format date for display
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch (e) {
+    return 'Unknown date';
+  }
+};
+
 // Mock video thumbnails and titles for demo purposes
 const mockVideoData = [
   {
     id: "v1",
+    youtube_video_id: "videoid1",
     title: "Learning Colors with Animals",
-    thumbnail: "https://i.ytimg.com/vi/videoid1/mqdefault.jpg",
-    duration: "4:32",
+    thumbnail_url: "https://i.ytimg.com/vi/videoid1/mqdefault.jpg",
+    duration_str: "4:32",
     category: "educational",
-    channelId: "ch1",
-    views: "1.2M",
-    publishedAt: "2023-10-15"
+    channel_id: "ch1",
+    channel_name: "Kids Learning Channel",
+    views: "1.2M views",
+    published_at: "2023-10-15T00:00:00Z",
+    safe: true,
+    age_rating: "all",
+    junk_score: 0,
+    loud_score: 0,
+    created_at: "2023-10-15T00:00:00Z",
+    updated_at: "2023-10-15T00:00:00Z"
   },
   {
     id: "v2",
+    youtube_video_id: "videoid2",
     title: "ABC Song | Phonics Song",
-    thumbnail: "https://i.ytimg.com/vi/videoid2/mqdefault.jpg",
-    duration: "3:15",
+    thumbnail_url: "https://i.ytimg.com/vi/videoid2/mqdefault.jpg",
+    duration_str: "3:15",
     category: "educational",
-    channelId: "ch1",
-    views: "2.4M",
-    publishedAt: "2023-09-20"
+    channel_id: "ch1",
+    channel_name: "Kids Learning Channel",
+    views: "2.4M views",
+    published_at: "2023-09-20T00:00:00Z",
+    safe: true,
+    age_rating: "all",
+    junk_score: 0,
+    loud_score: 0,
+    created_at: "2023-09-20T00:00:00Z",
+    updated_at: "2023-09-20T00:00:00Z"
   },
   {
     id: "v3",
+    youtube_video_id: "videoid3",
     title: "The Adventures of Teddy Bear - Episode 1",
-    thumbnail: "https://i.ytimg.com/vi/videoid3/mqdefault.jpg",
-    duration: "11:24",
+    thumbnail_url: "https://i.ytimg.com/vi/videoid3/mqdefault.jpg",
+    duration_str: "11:24",
     category: "cartoons",
-    channelId: "ch2",
-    views: "876K",
-    publishedAt: "2023-11-05"
+    channel_id: "ch2",
+    channel_name: "Cartoon World",
+    views: "876K views",
+    published_at: "2023-11-05T00:00:00Z",
+    safe: true,
+    age_rating: "all",
+    junk_score: 0,
+    loud_score: 0,
+    created_at: "2023-11-05T00:00:00Z",
+    updated_at: "2023-11-05T00:00:00Z"
   },
   {
     id: "v4",
+    youtube_video_id: "videoid4",
     title: "How Plants Grow - Science for Kids",
-    thumbnail: "https://i.ytimg.com/vi/videoid4/mqdefault.jpg",
-    duration: "7:42",
+    thumbnail_url: "https://i.ytimg.com/vi/videoid4/mqdefault.jpg",
+    duration_str: "7:42",
     category: "educational",
-    channelId: "ch3",
-    views: "543K",
-    publishedAt: "2023-08-12"
+    channel_id: "ch3",
+    channel_name: "Science for Kids",
+    views: "543K views",
+    published_at: "2023-10-10T00:00:00Z",
+    safe: true,
+    age_rating: "all",
+    junk_score: 0,
+    loud_score: 0,
+    created_at: "2023-10-10T00:00:00Z",
+    updated_at: "2023-10-10T00:00:00Z"
   },
   {
     id: "v5",
-    title: "Baby Shark Dance | Kids Songs",
-    thumbnail: "https://i.ytimg.com/vi/videoid5/mqdefault.jpg",
-    duration: "2:16",
+    youtube_video_id: "videoid5",
+    title: "Dinosaur Song | T-Rex, Triceratops, Stegosaurus",
+    thumbnail_url: "https://i.ytimg.com/vi/videoid5/mqdefault.jpg",
+    duration_str: "5:18",
     category: "music",
-    channelId: "ch5",
-    views: "10.5M",
-    publishedAt: "2023-07-30"
+    channel_id: "ch1",
+    channel_name: "Kids Learning Channel",
+    views: "3.1M views",
+    published_at: "2023-08-15T00:00:00Z",
+    safe: true,
+    age_rating: "all",
+    junk_score: 0,
+    loud_score: 0,
+    created_at: "2023-08-15T00:00:00Z",
+    updated_at: "2023-08-15T00:00:00Z"
   },
   {
     id: "v6",
+    youtube_video_id: "videoid6",
     title: "DIY Slime Recipe - Easy Craft for Kids",
-    thumbnail: "https://i.ytimg.com/vi/videoid6/mqdefault.jpg",
-    duration: "8:53",
+    thumbnail_url: "https://i.ytimg.com/vi/videoid6/mqdefault.jpg",
+    duration_str: "8:53",
     category: "crafts",
-    channelId: "ch6",
-    views: "1.8M",
-    publishedAt: "2023-10-28"
+    channel_id: "ch6",
+    channel_name: "Crafts for Kids",
+    views: "1.8M views",
+    published_at: "2023-06-25T00:00:00Z",
+    safe: true,
+    age_rating: "all",
+    junk_score: 0,
+    loud_score: 0,
+    created_at: "2023-06-25T00:00:00Z",
+    updated_at: "2023-06-25T00:00:00Z"
   }
 ];
 
@@ -126,11 +224,11 @@ export default function ChannelVideosPage() {
       if (storedVideos) {
         const allVideos = JSON.parse(storedVideos);
         // Filter videos for this channel
-        const channelVideos = allVideos.filter((v: Video) => v.channelId === channelId);
+        const channelVideos = allVideos.filter((v: Video) => v.channel_id === channelId);
         setVideos(channelVideos);
       } else {
         // Create mock videos for the demo
-        const channelVideos = mockVideoData.filter(v => v.channelId === channelId);
+        const channelVideos = mockVideoData.filter(v => v.channel_id === channelId);
         setVideos(channelVideos);
         
         // Save to localStorage for demo purposes
@@ -198,7 +296,7 @@ export default function ChannelVideosPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-                  {channel.name}
+                  {channel.channel_name}
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Parent Preview Mode
@@ -213,10 +311,10 @@ export default function ChannelVideosPage() {
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-              {channel.thumbnail ? (
+              {channel.thumbnail_url ? (
                 <img 
-                  src={channel.thumbnail} 
-                  alt={channel.name} 
+                  src={channel.thumbnail_url} 
+                  alt={channel.channel_name} 
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -227,10 +325,10 @@ export default function ChannelVideosPage() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                {channel.name}
+                {channel.channel_name}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                {channel.subscriberCount} subscribers • {channel.videoCount} videos
+                {channel.subscriber_count} subscribers • {channel.video_count} videos
               </p>
             </div>
           </div>
@@ -246,9 +344,9 @@ export default function ChannelVideosPage() {
                   <Card className="overflow-hidden border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer bg-white dark:bg-gray-800">
                     <div className="relative pb-[56.25%]"> {/* 16:9 aspect ratio */}
                       <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                        {video.thumbnail ? (
+                        {video.thumbnail_url ? (
                           <img 
-                            src={video.thumbnail} 
+                            src={video.thumbnail_url} 
                             alt={video.title} 
                             className="w-full h-full object-cover"
                           />
@@ -260,7 +358,7 @@ export default function ChannelVideosPage() {
                         )}
                       </div>
                       <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
-                        {video.duration}
+                        {video.duration_str}
                       </div>
                     </div>
                     
@@ -269,9 +367,9 @@ export default function ChannelVideosPage() {
                         {video.title}
                       </h3>
                       <div className="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-500">
-                        <span>{video.views} views</span>
-                        <span className="mx-1">•</span>
-                        <span>{new Date(video.publishedAt).toLocaleDateString()}</span>
+                        <div className="text-gray-500 text-sm">
+                          {video.views} • {formatDate(video.published_at)}
+                        </div>
                       </div>
                     </div>
                   </Card>

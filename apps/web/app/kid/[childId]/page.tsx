@@ -5,7 +5,28 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
-import { type ChildProfile, type Channel } from "@repo/lib/src/types";
+// Custom type definitions to match Supabase schema
+interface ChildProfile {
+  id: string;
+  name: string;
+  avatar_color?: string;
+  parent_id: string;
+  pin?: string;
+  created_at?: string;
+}
+
+interface Channel {
+  id: string;
+  channel_id: string;
+  channel_name: string;
+  thumbnail_url?: string;
+  description?: string;
+  subscriber_count?: string;
+  video_count?: string;
+  safe?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
 
 // Mock data storage keys
 const CHILD_PROFILES_KEY = "kidsafe_child_profiles";
@@ -55,54 +76,73 @@ export default function KidModePage() {
   // Mock data for channels if none exist
   useEffect(() => {
     if (!isLoading && channels.length === 0) {
+      // For demo purposes, create mock data if no channels exist
       const mockChannels = [
         {
           id: "ch1",
-          name: "Kids Learning Fun",
-          thumbnail: "https://i.ytimg.com/vi/channel1/mqdefault.jpg",
-          subscriberCount: "2.5M",
-          videoCount: 245,
-          childIds: [childId]
+          channel_id: "ch1",
+          channel_name: "Kids Learning Channel",
+          thumbnail_url: "https://i.ytimg.com/vi/channel1/mqdefault.jpg",
+          subscriber_count: "2.1M",
+          video_count: "450",
+          safe: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         },
         {
           id: "ch2",
-          name: "Storytime Adventures",
-          thumbnail: "https://i.ytimg.com/vi/channel2/mqdefault.jpg",
-          subscriberCount: "1.8M",
-          videoCount: 189,
-          childIds: [childId]
+          channel_id: "ch2",
+          channel_name: "Cartoon World",
+          thumbnail_url: "https://i.ytimg.com/vi/channel2/mqdefault.jpg",
+          subscriber_count: "3.5M",
+          video_count: "320",
+          safe: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         },
         {
           id: "ch3",
-          name: "Science for Kids",
-          thumbnail: "https://i.ytimg.com/vi/channel3/mqdefault.jpg",
-          subscriberCount: "3.2M",
-          videoCount: 312,
-          childIds: [childId]
+          channel_id: "ch3",
+          channel_name: "Science for Kids",
+          thumbnail_url: "https://i.ytimg.com/vi/channel3/mqdefault.jpg",
+          subscriber_count: "1.2M",
+          video_count: "180",
+          safe: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         },
         {
           id: "ch4",
-          name: "Cartoon Time",
-          thumbnail: "https://i.ytimg.com/vi/channel4/mqdefault.jpg",
-          subscriberCount: "5.7M",
-          videoCount: 423,
-          childIds: [childId]
+          channel_id: "ch4",
+          channel_name: "Story Time",
+          thumbnail_url: "https://i.ytimg.com/vi/channel4/mqdefault.jpg",
+          subscriber_count: "850K",
+          video_count: "120",
+          safe: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         },
         {
           id: "ch5",
-          name: "Music for Little Ones",
-          thumbnail: "https://i.ytimg.com/vi/channel5/mqdefault.jpg",
-          subscriberCount: "1.2M",
-          videoCount: 156,
-          childIds: [childId]
+          channel_id: "ch5",
+          channel_name: "Music for Kids",
+          thumbnail_url: "https://i.ytimg.com/vi/channel5/mqdefault.jpg",
+          subscriber_count: "1.8M",
+          video_count: "280",
+          safe: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         },
         {
           id: "ch6",
-          name: "Art & Crafts Club",
-          thumbnail: "https://i.ytimg.com/vi/channel6/mqdefault.jpg",
-          subscriberCount: "980K",
-          videoCount: 210,
-          childIds: [childId]
+          channel_id: "ch6",
+          channel_name: "Art & Crafts Club",
+          thumbnail_url: "https://i.ytimg.com/vi/channel6/mqdefault.jpg",
+          subscriber_count: "980K",
+          video_count: "210",
+          safe: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }
       ];
       
@@ -190,10 +230,10 @@ export default function KidModePage() {
                   <div className="p-4">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                        {channel.thumbnail ? (
+                        {channel.thumbnail_url ? (
                           <img 
-                            src={channel.thumbnail} 
-                            alt={channel.name} 
+                            src={channel.thumbnail_url} 
+                            alt={channel.channel_name} 
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -204,15 +244,15 @@ export default function KidModePage() {
                       </div>
                       <div>
                         <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                          {channel.name}
+                          {channel.channel_name}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {channel.subscriberCount} subscribers
+                          {channel.subscriber_count} subscribers
                         </p>
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {channel.videoCount} approved videos
+                      {channel.video_count} approved videos
                     </p>
                   </div>
                 </Card>

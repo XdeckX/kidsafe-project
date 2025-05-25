@@ -28,8 +28,15 @@ export function SafePlayer({ videoId, onVideoEnd, autoplay = false, title }: Saf
     // Initialize YouTube API
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    const scriptTags = document.getElementsByTagName('script');
+    
+    // Add proper null checking
+    if (scriptTags && scriptTags.length > 0) {
+      const firstScriptTag = scriptTags[0];
+      if (firstScriptTag && firstScriptTag.parentNode) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+    }
 
     return () => {
       // Clean up interval on unmount
