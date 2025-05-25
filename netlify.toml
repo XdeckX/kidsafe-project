@@ -1,0 +1,11 @@
+[build]
+  base = "/"
+  command = "npm install && npm run build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NEXT_PUBLIC_SUPABASE_URL = "https://icxnagsnigymjpjcxysl.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljeG5hZ3NuaWd5bWpwamN4eXNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMzI4ODksImV4cCI6MjA2MzcwODg4OX0.FtYTsj6VfEradRYm_rV1IQHzYtGGl1U3OfY7zZGrMVA"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
